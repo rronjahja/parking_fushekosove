@@ -1,0 +1,241 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Tema: variablat semantike ─────────────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+  --c-canvas: 5 11 22;
+  /* #050B16 */
+  --c-surface: 12 22 38;
+  /* #0C1626 */
+  --c-raised: 18 31 52;
+  /* #121F34 */
+  --c-line: 74 108 155;
+  /* vija/border (me alpha) */
+  --c-ink: 232 240 251;
+  /* teksti kryesor */
+  --c-faint: 138 162 192;
+  /* teksti i zbehte */
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --c-canvas: 238 243 250;
+  --c-surface: 255 255 255;
+  --c-raised: 244 248 253;
+  --c-line: 96 128 170;
+  --c-ink: 11 27 49;
+  --c-faint: 90 110 138;
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink font-body antialiased;
+  background-image:
+    radial-gradient(1100px 500px at 85% -10%, rgb(34 211 238 / 0.10), transparent 60%),
+    radial-gradient(900px 420px at -10% 30%, rgb(59 130 246 / 0.08), transparent 55%);
+  background-attachment: fixed;
+}
+
+[data-theme='light'] body {
+  background-image:
+    radial-gradient(1100px 500px at 85% -10%, rgb(34 211 238 / 0.14), transparent 60%),
+    radial-gradient(900px 420px at -10% 30%, rgb(59 130 246 / 0.10), transparent 55%);
+}
+
+/* ─── Komponentet baze ──────────────────────────────────────────────────── */
+@layer components {
+  .card {
+    @apply rounded-2xl bg-surface/90 shadow-card backdrop-blur;
+    border: 1px solid rgb(var(--c-line) / 0.18);
+  }
+
+  .card-pad {
+    @apply card p-4 sm:p-5;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 select-none disabled:opacity-45 disabled:pointer-events-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-primary {
+    @apply btn bg-cyan text-[#04222B] hover:brightness-110 shadow-glow;
+  }
+
+  .btn-amber {
+    @apply btn bg-amber text-[#2B1A02] hover:brightness-110;
+  }
+
+  .btn-mint {
+    @apply btn bg-mint text-[#03291B] hover:brightness-110;
+  }
+
+  .btn-ghost {
+    @apply btn bg-raised text-ink hover:bg-raised/70;
+    border: 1px solid rgb(var(--c-line) / 0.22);
+  }
+
+  .btn-danger {
+    @apply btn bg-rose/15 text-rose hover:bg-rose/25;
+    border: 1px solid rgb(251 113 133 / .35);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    border: 1px solid rgb(var(--c-line) / 0.2);
+  }
+
+  .chip-mint {
+    @apply chip bg-mint/15 text-mint;
+    border-color: rgb(52 211 153 / .35);
+  }
+
+  .chip-rose {
+    @apply chip bg-rose/15 text-rose;
+    border-color: rgb(251 113 133 / .35);
+  }
+
+  .chip-amber {
+    @apply chip bg-amber/15 text-amber;
+    border-color: rgb(251 191 36 / .35);
+  }
+
+  .chip-azure {
+    @apply chip bg-azure/15 text-[#7EB0FF];
+    border-color: rgb(59 130 246 / .4);
+  }
+
+  .input {
+    @apply w-full rounded-xl bg-raised px-3.5 py-2.5 text-sm text-ink placeholder:text-faint/70 outline-none transition-shadow;
+    border: 1px solid rgb(var(--c-line) / 0.25);
+  }
+
+  .input:focus {
+    box-shadow: 0 0 0 3px rgb(34 211 238 / 0.25);
+    border-color: #22D3EE;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-faint;
+  }
+
+  /* Elementi "firmë": fusha e targës si tabelë e vërtetë */
+  .plate-input {
+    @apply font-mono text-base font-bold tracking-[0.18em] uppercase text-center;
+    background: linear-gradient(180deg, rgb(var(--c-raised)), rgb(var(--c-surface)));
+  }
+
+  .plate-band {
+    @apply absolute left-0 top-0 h-full w-7 rounded-l-xl flex flex-col items-center justify-center;
+    background: #1D4ED8;
+  }
+}
+
+/* ─── Leaflet: pamja e hartës ───────────────────────────────────────────── */
+.leaflet-container {
+  @apply rounded-2xl font-body;
+  background: rgb(var(--c-raised));
+}
+
+.leaflet-control-zoom a {
+  background: rgb(var(--c-surface)) !important;
+  color: rgb(var(--c-ink)) !important;
+  border-color: rgb(var(--c-line) / 0.25) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgb(var(--c-surface) / 0.75) !important;
+  color: rgb(var(--c-faint)) !important;
+  font-size: 10px !important;
+}
+
+.leaflet-control-attribution a {
+  color: rgb(var(--c-faint)) !important;
+}
+
+/* Etiketa e numrit mbi vend-parkim */
+.spot-label {
+  background: transparent;
+  border: none;
+}
+
+.spot-label>div {
+  @apply flex items-center justify-center rounded-full font-mono font-bold text-[11px] leading-none text-white;
+  width: 22px;
+  height: 22px;
+  /* E lirë = jeshile (si drejtkëndëshi kur zmadhohet) */
+  background: #059669;
+  border: 1.5px solid rgb(255 255 255 / 0.9);
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+}
+
+.spot-label>div.is-accessible {
+  background: #1D4ED8;
+  border-color: #93C5FD;
+  font-size: 12px;
+}
+
+.spot-label>div.is-taken {
+  background: #E11D48;
+  border-color: #FB7185;
+}
+
+.spot-label>div.is-selected {
+  background: #F59E0B;
+  border-color: #FBBF24;
+  color: #2B1A02;
+}
+
+/* Markeri i Ndërtuesit (drag & drop) */
+.builder-pin {
+  background: transparent;
+  border: none;
+}
+
+.builder-pin>div {
+  @apply flex items-center justify-center rounded-lg font-mono font-bold text-xs text-white cursor-grab;
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgb(255 255 255 / 0.9);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.55);
+}
+
+.builder-pin>div:active {
+  cursor: grabbing;
+}
+
+/* Scrollbar diskret */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-line) / 0.35);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

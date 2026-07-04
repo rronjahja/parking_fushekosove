@@ -1,0 +1,17 @@
+{
+  "name": "parking-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistemi i Parkingut - Fushe Kosove | Monitorim, rezervim, pagese dhe navigim ne kohe reale",
+  "scripts": {
+    "setup": "npm install && npm --prefix server install && npm --prefix client install",
+    "dev": "concurrently -n SERVER,CLIENT -c cyan,yellow \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "seed": "npm --prefix server run seed",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "doctor": "npm --prefix server run doctor"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
