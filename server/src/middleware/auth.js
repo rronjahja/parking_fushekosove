@@ -40,3 +40,11 @@ export function requireRole(...roles) {
     next();
   };
 }
+
+// Identitet OPSIONAL: nëse ka token të vlefshëm e vendos req.user, përndryshe
+// vazhdon si vizitor anonim (req.user = null). Nuk bllokon kurrë kërkesën.
+export function optionalIdentity(req, _res, next) {
+  const claims = parseToken(req);
+  req.user = claims ? { id: claims.sub, role: claims.role, name: claims.name } : null;
+  next();
+}

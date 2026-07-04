@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, useMapEvent } from 'react-leaflet';
 import { LayerSwitcher } from './LayerSwitcher.jsx';
 import { SpotShape } from './SpotShape.jsx';
 import { TILE_LAYERS, MAP_MAX_ZOOM } from './tileLayers.js';
@@ -14,6 +14,13 @@ function FlyTo({ center, zoom }) {
   return null;
 }
 
+// Kap klikimet në hartë (jo mbi vend) → çzgjedh vendin aktual.
+function MapClickHandler({ onDeselect }) {
+  useMapEvent('click', () => onDeselect());
+  return null;
+}
+
+
 // Ndjek nivelin aktual të zoom-it të hartës.
 function ZoomWatcher({ onZoom }) {
   const map = useMap();
@@ -26,7 +33,7 @@ function ZoomWatcher({ onZoom }) {
   return null;
 }
 
-export function ParkingMap({ zone, spots, selectedNumber, onSpotClick, flyTarget, heightClass = 'h-[420px] sm:h-[520px]' }) {
+export function ParkingMap({ zone, spots, selectedNumber, onSpotClick, onDeselect, flyTarget, heightClass = 'h-[420px] sm:h-[520px]' }) {
   const [layerKey, setLayerKey] = useState('hybrid');
   const [zoomLevel, setZoomLevel] = useState(zone?.zoomLevel ?? 18);
   const { theme } = useTheme();
@@ -50,6 +57,7 @@ export function ParkingMap({ zone, spots, selectedNumber, onSpotClick, flyTarget
         className="h-full w-full"
         zoomControl
       >
+
         {/*
           maxNativeZoom = niveli i fundit ku ofruesi ka pllaka reale;
           maxZoom = MAP_MAX_ZOOM lejon "overzoom" (Leaflet zmadhon pllakën
@@ -73,7 +81,11 @@ export function ParkingMap({ zone, spots, selectedNumber, onSpotClick, flyTarget
             maxZoom={MAP_MAX_ZOOM}
           />
         ))}
+
+
+
         <FlyTo center={flyTarget?.center || zone.mapCenter} zoom={flyTarget?.zoom ?? zone.zoomLevel} />
+        <MapClickHandler onDeselect={() => onDeselect?.()} />
         <ZoomWatcher onZoom={setZoomLevel} />
         {spots.map((s) => (
           <SpotShape

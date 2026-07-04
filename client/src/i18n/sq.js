@@ -6,7 +6,7 @@ export const t = {
   free: 'të lira',
   occupied: 'të zëna',
   infoBanner: 'Vendet me ndriçim të gjelbër janë të lira. Të dhënat rifreskohen automatikisht çdo 2 sekonda.',
-  legend: { free: 'E lirë', taken: 'E zënë', selected: 'E zgjedhur', accessible: 'Vend invalid' },
+  legend: { free: 'E lirë', taken: 'E zënë', selected: 'E zgjedhur', accessible: 'Aftësi të kufizuara' },
   chooseZone: 'Zgjedh Zonën',
   liveMap: 'Harta live e parkingut',
   parking: 'Parkingu',

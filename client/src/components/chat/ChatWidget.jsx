@@ -16,7 +16,7 @@ export function ChatWidget() {
       {open && <ChatWindow agentStatus={agentStatus} onClose={() => setOpen(false)} />}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 right-4 z-[901] flex h-14 w-14 items-center justify-center rounded-full bg-cyan text-[#04222B] shadow-glow transition-transform hover:scale-105"
+       className="fixed bottom-5 right-4 z-[901] flex h-14 w-14 items-center justify-center rounded-full bg-amber text-[#2B1A02] shadow-glow transition-transform hover:scale-105"
         aria-label="Suporti Live"
       >
         <MessageCircle size={24} />

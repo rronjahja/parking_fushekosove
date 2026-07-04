@@ -163,3 +163,30 @@ export async function reservationHistoryForOwner(ownerId, limit = 100) {
   );
   return Promise.all(rows.map(mapReservation));
 }
+
+// Pasuron vendet e një zone me info rezervimi:
+//  • expiringSoon: rezervimi aktiv skadon brenda 10 minutave
+//  • mine: rezervimi aktiv i përket përdoruesit aktual (për shenjën në hartë)
+export async function spotsWithReservationInfo(zoneId, currentUserId = null) {
+  const spots = await db.query('SELECT * FROM spots WHERE zone_id = ? ORDER BY number', [zoneId]);
+  const actives = await db.query(
+    `SELECT spot_id, owner_id, expires_at,
+            TIMESTAMPDIFF(SECOND, NOW(), expires_at) AS seconds_left
+     FROM reservations WHERE zone_id = ? AND status IN ('active','pending')`,
+    [zoneId]
+  );
+  const bySpot = new Map();
+  for (const r of actives) bySpot.set(r.spot_id, r);
+
+  return spots.map((s) => {
+    const r = bySpot.get(s.id);
+    const secondsLeft = r ? Number(r.seconds_left) : null;
+    return {
+      id: s.id, zoneId: s.zone_id, number: s.number, type: s.type, status: s.status,
+      lat: s.lat, lng: s.lng, angleDeg: s.angle_deg, updatedAt: s.updated_at,
+      expiringSoon: secondsLeft !== null && secondsLeft > 0 && secondsLeft <= 600,
+      secondsLeft: secondsLeft !== null && secondsLeft > 0 ? secondsLeft : null,
+      mine: Boolean(r && currentUserId && r.owner_id === currentUserId),
+    };
+  });
+}

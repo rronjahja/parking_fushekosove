@@ -17,6 +17,7 @@ import { FindCarModal } from '../components/spot/FindCarModal.jsx';
 import { ChatWidget } from '../components/chat/ChatWidget.jsx';
 import { AdminDashboard } from '../components/admin/AdminDashboard.jsx';
 import { useNavigate } from 'react-router-dom';
+import { fetchProfile } from '../api/endpoints.js';
 
 // Faqja kryesore publike: zonat, harta live, zgjedhja e vendit, pagesa,
 // navigimi, "Gjej veturën time" dhe chat-i i mbështetjes.
@@ -39,11 +40,18 @@ export function HomePage() {
   const [adminOpen, setAdminOpen] = useState(false);
   const [flyTarget, setFlyTarget] = useState(null);
   const [pendingFocus, setPendingFocus] = useState(null);
+  const [savedPlate, setSavedPlate] = useState('');
 
   // Tarifat merren një herë - burimi autoritar mbetet backend-i.
   useEffect(() => {
     fetchTariffs().then((d) => setTariffs(d.tariffs)).catch(() => { });
   }, []);
+
+  // Targa e ruajtur e përdoruesit (për mbushje automatike gjatë rezervimit).
+  useEffect(() => {
+    if (!isAuthed) { setSavedPlate(''); return; }
+    fetchProfile().then((d) => setSavedPlate(d.user.savedPlate || '')).catch(() => { });
+  }, [isAuthed]);
 
   // Rifreskimi automatik çdo 2 sekonda: zonat + vendet e zonës aktive.
   usePolling(() => {
@@ -136,6 +144,7 @@ export function HomePage() {
 
   const onReserved = (reservation) => {
     setMyReservations((list) => [reservation, ...list]);
+    setSelectedNumber(null);
     refreshPersonal();
     if (activeZoneId) fetchZoneSpots(activeZoneId).then(setZoneData).catch(() => { });
   };
@@ -163,6 +172,7 @@ export function HomePage() {
           spots={spots}
           selectedNumber={selectedNumber}
           onSpotClick={(s) => openSpot(s)}
+          onDeselect={() => setSelectedNumber(null)}
           flyTarget={flyTarget}
           heightClass="h-[420px] sm:h-[520px] lg:h-[620px]"
         />
@@ -178,6 +188,7 @@ export function HomePage() {
           spot={selectedSpot}
           tariffs={tariffs}
           wallet={wallet}
+          savedPlate={savedPlate}
           myReservation={myReservationHere(selectedSpot.number)}
           onWalletRefresh={(w) => (w ? setWallet(w) : refreshPersonal())}
           onReserved={onReserved}

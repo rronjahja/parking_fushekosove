@@ -3,19 +3,49 @@ import { Link } from 'react-router-dom';
 import {
     ArrowLeft, User, Wallet, Car, MessageSquare, CheckCircle2, XCircle, Mail, Phone,
 } from 'lucide-react';
-import { fetchProfile, requestVerification, confirmVerification } from '../api/endpoints.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Spinner } from '../components/ui/Spinner.jsx';
 import { euro, timeHM, dateDMY, methodLabel, statusLabel } from '../utils/format.js';
+import { fetchProfile, requestVerification, confirmVerification, saveProfilePlate } from '../api/endpoints.js';
+
+
+// Formatimi i targës vendore: 0Y-XXX-ZZ. Të huajat: pa validim.
+function formatPlateValue(raw, foreign) {
+    if (foreign) return raw.toUpperCase().replace(/[^A-Z0-9\s-]/g, '').slice(0, 14);
+    const clean = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let out = '';
+    for (let i = 0; i < clean.length && out.replace(/-/g, '').length < 7; i++) {
+        const ch = clean[i];
+        const pos = out.replace(/-/g, '').length;
+        if (pos === 0) { if (ch === '0') out += '0'; }
+        else if (pos === 1) { if (/[1-7]/.test(ch)) out += ch; }
+        else if (pos >= 2 && pos <= 4) { if (/[0-9]/.test(ch)) out += ch; }
+        else if (pos >= 5 && pos <= 6) { if (/[A-Z]/.test(ch)) out += ch; }
+        const n = out.replace(/-/g, '').length;
+        if (n === 2 && !out.includes('-')) out += '-';
+        if (n === 5 && out.split('-').length < 3) out += '-';
+    }
+    return out;
+}
 
 export function ProfilePage() {
     const { refreshUser } = useAuth();
     const toast = useToast();
     const [data, setData] = useState(null);
     const [tab, setTab] = useState('parkings');
+    const [plateInput, setPlateInput] = useState('');
+    const [savingPlate, setSavingPlate] = useState(false);
+    const [plateForeign, setPlateForeign] = useState(false);
 
-    const load = () => fetchProfile().then(setData).catch((e) => toast.error(e.message));
+
+    const load = () => fetchProfile().then((d) => {
+        setData(d);
+        const saved = d.user.savedPlate || '';
+        setPlateInput(saved);
+        setPlateForeign(saved ? !/^0[1-7]-\d{3}-[A-Z]{2}$/.test(saved) : false);
+    }).catch((e) => toast.error(e.message));
+
     useEffect(() => { load(); }, []); // eslint-disable-line
 
     const verify = async (channel) => {
@@ -33,7 +63,15 @@ export function ProfilePage() {
             await refreshUser();
         } catch (e) { toast.error(e.message); }
     };
-
+    const savePlate = async () => {
+        setSavingPlate(true);
+        try {
+            const { savedPlate } = await saveProfilePlate(plateInput.trim());
+            toast.success(savedPlate ? 'Targa u ruajt.' : 'Targa u hoq.');
+            await load();
+        } catch (e) { toast.error(e.message); }
+        finally { setSavingPlate(false); }
+    };
     if (!data) {
         return <div className="flex min-h-screen items-center justify-center"><Spinner size={26} /></div>;
     }
@@ -63,7 +101,7 @@ export function ProfilePage() {
                         <p className="text-xs text-faint">Anëtar që nga {dateDMY(user.createdAt)}</p>
                     </div>
                 </div>
-                <Link to="/" className="btn-ghost text-xs"><ArrowLeft size={14} /> Harta</Link>
+                <Link to="/" className="btn-ghost text-xs"><ArrowLeft size={14} /> Mbrapa</Link>
             </header>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -90,7 +128,51 @@ export function ProfilePage() {
                     <Link to="/" className="btn-mint !py-2 text-xs">Rimbush</Link>
                 </section>
             </div>
+            {/* Makina ime: targa e ruajtur (mbushet automatikisht gjatë rezervimit) */}
+            <section className="card-pad space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                    <h2 className="label !mb-0 flex items-center gap-1.5"><Car size={13} /> Makina ime</h2>
+                    {/* Switch: off = Vendore, on = Targa të Huaja */}
+                    <label className="flex cursor-pointer items-center gap-2 text-xs">
+                        <span className={plateForeign ? 'text-faint' : 'font-semibold text-cyan'}>Vendore</span>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={plateForeign}
+                            onClick={() => { setPlateForeign((v) => !v); setPlateInput(''); }}
+                            className={`relative h-5 w-9 rounded-full transition-colors ${plateForeign ? 'bg-cyan' : 'bg-line/40'}`}
+                        >
+                            <span
+                                className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${plateForeign ? 'left-[18px]' : 'left-0.5'}`}
+                            />
+                        </button>
+                        <span className={plateForeign ? 'font-semibold text-cyan' : 'text-faint'}>Targa të Huaja</span>
+                    </label>
+                </div>
 
+                <div className="flex items-center justify-center gap-2">
+                    <div className="relative w-[205px]">
+                        <span className="plate-band">
+                            {plateForeign ? null : (
+                                <>
+                                    <span className="text-[8px] font-bold text-yellow-300">★</span>
+                                    <span className="text-[8px] font-bold text-white">RKS</span>
+                                </>
+                            )}
+                        </span>
+                        <input
+                            value={plateInput}
+                            onChange={(e) => setPlateInput(formatPlateValue(e.target.value, plateForeign))}
+                            placeholder={plateForeign ? 'Targa e huaj' : '0X-XXX-ZZ'}
+                            maxLength={plateForeign ? 15 : 9}
+                            className="input plate-input !pl-9 !pr-2"
+                        />
+                    </div>
+                    <button onClick={savePlate} disabled={savingPlate} className="btn-primary shrink-0 !px-6 !py-2 text-xs">
+                        {savingPlate ? <Spinner size={13} /> : 'Ruaj'}
+                    </button>
+                </div>
+            </section>
             <div className="flex gap-2">
                 <button onClick={() => setTab('parkings')} className={`btn !py-2 text-xs ${tab === 'parkings' ? 'bg-cyan text-[#04222B]' : 'btn-ghost'}`}>
                     <Car size={14} /> Parkimet ({reservations.length})

@@ -13,7 +13,8 @@ export const requestVerification = (channel) =>
   api('/profile/verify/request', { method: 'POST', body: { channel } });
 export const confirmVerification = (channel, code) =>
   api('/profile/verify/confirm', { method: 'POST', body: { channel, code } });
-
+export const saveProfilePlate = (plate) =>
+  api('/profile/plate', { method: 'PUT', body: { plate } });
 // ── Publike ──
 export const fetchZones = () => api('/zones');
 export const fetchZoneSpots = (zoneId) => api(`/zones/${zoneId}/parkings`);

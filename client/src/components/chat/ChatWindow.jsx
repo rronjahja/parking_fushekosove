@@ -85,7 +85,7 @@ export function ChatWindow({ agentStatus, onClose }) {
       {!chat ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <p className="text-sm text-faint">{t.chat.intro}</p>
-          <button onClick={start} className="btn-primary">{t.chat.start}</button>
+          <button onClick={start} className="btn-amber">{t.chat.start}</button>
         </div>
       ) : (
         <>
@@ -128,7 +128,7 @@ export function ChatWindow({ agentStatus, onClose }) {
               <p className="text-xs text-faint">Kjo bisedë u mbyll nga agjenti.</p>
               <button
                 onClick={() => { setChat(null); setMessages([]); }}
-                className="btn-primary w-full !py-2 text-xs"
+                className="btn-amber w-full !py-2 text-xs"
               >
                 Fillo bisedë të re
               </button>
@@ -142,7 +142,7 @@ export function ChatWindow({ agentStatus, onClose }) {
                   placeholder={t.chat.placeholder}
                   className="input !py-2 text-sm"
                 />
-                <button type="submit" className="btn-primary !px-3 !py-2" aria-label={t.chat.send}>
+                <button type="submit" className="btn-amber !px-3 !py-2" aria-label={t.chat.send}>
                   <Send size={15} />
                 </button>
               </form>

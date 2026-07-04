@@ -17,15 +17,18 @@ const METHOD_META = [
 
 // Seksioni "Pagesa": kohëzgjatja, targa, metoda, totali dhe Paguaj & Rezervo.
 // Butoni kryesor mbrohet nga klikimet e dyfishta (disabled gjatë procesimit).
-export function PaymentTab({ zone, spot, tariffs, wallet, onWalletRefresh, onReserved }) {
+export function PaymentTab({ zone, spot, tariffs, wallet, savedPlate = '', onWalletRefresh, onReserved }) {
   const toast = useToast();
   const [durationKey, setDurationKey] = useState(tariffs[0]?.key);
-  const [plate, setPlate] = useState(localStorage.getItem('ps_last_plate') || '');
+  const [plate, setPlate] = useState(savedPlate || localStorage.getItem('ps_last_plate') || '');
   const [foreignPlate, setForeignPlate] = useState(false);
   // Nëse tarifat mbërrijnë pas hapjes së modalit, zgjidh automatikisht të parën.
   useEffect(() => {
     if (!durationKey && tariffs[0]) setDurationKey(tariffs[0].key);
   }, [tariffs, durationKey]);
+  useEffect(() => {
+    if (savedPlate) setPlate(savedPlate);
+  }, [savedPlate]);
   const [method, setMethod] = useState('credits');
   const [busy, setBusy] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
@@ -63,9 +66,8 @@ export function PaymentTab({ zone, spot, tariffs, wallet, onWalletRefresh, onRes
             <button
               key={key}
               onClick={() => setMethod(key)}
-              className={`btn !py-2.5 text-xs ${
-                method === key ? activeCls : 'bg-raised border border-line/25 text-ink hover:border-line/45'
-              }`}
+              className={`btn !py-2.5 text-xs ${method === key ? activeCls : 'bg-raised border border-line/25 text-ink hover:border-line/45'
+                }`}
             >
               <Icon size={14} /> {label}
             </button>

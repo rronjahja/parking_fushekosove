@@ -224,3 +224,6 @@ CREATE TABLE IF NOT EXISTS `verification_codes` (
   PRIMARY KEY (`id`),
   KEY `idx_vcodes_user` (`user_id`, `channel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE users ADD COLUMN saved_plate VARCHAR(32) DEFAULT NULL;

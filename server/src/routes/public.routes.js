@@ -4,7 +4,8 @@ import { db } from '../db/connection.js';
 import { TARIFFS, CREDITS_PER_EURO } from '../config/tariffs.js';
 import { listZonesWithCounts, listSpots, getZone } from '../services/layout.service.js';
 import { totalsStatus } from '../services/stats.service.js';
-import { findCarByPlate, getSpotOrThrow } from '../services/reservation.service.js';
+import { findCarByPlate, getSpotOrThrow, spotsWithReservationInfo } from '../services/reservation.service.js';
+import { optionalIdentity } from '../middleware/auth.js';
 import { requireZoneId, requireInt, bad } from '../utils/validators.js';
 import { agentsOnline } from '../services/support.service.js';
 
@@ -14,7 +15,7 @@ publicRouter.get('/zones', async (_req, res, next) => {
   try { res.json({ zones: await listZonesWithCounts() }); } catch (e) { next(e); }
 });
 
-publicRouter.get('/zones/:zoneId/parkings', async (req, res, next) => {
+publicRouter.get('/zones/:zoneId/parkings', optionalIdentity, async (req, res, next) => {
   try {
     const zoneId = requireZoneId(req.params.zoneId);
     const zone = await getZone(zoneId);
@@ -24,7 +25,7 @@ publicRouter.get('/zones/:zoneId/parkings', async (req, res, next) => {
         mapCenter: { lat: zone.center_lat, lng: zone.center_lng },
         zoomLevel: zone.zoom,
       },
-      spots: await listSpots(zoneId),
+      spots: await spotsWithReservationInfo(zoneId, req.user?.id || null),
     });
   } catch (e) { next(e); }
 });
@@ -72,3 +73,4 @@ publicRouter.get('/system/health', async (_req, res) => {
   try { await db.one('SELECT 1 AS x'); } catch { dbOk = false; }
   res.json({ ok: dbOk, database: dbOk ? 'connected' : 'down', uptimeSeconds: Math.round(process.uptime()) });
 });
+

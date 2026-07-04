@@ -74,7 +74,7 @@ export function BuilderSidebar({
               onClick={() => onNewType('accessible')}
               className={`btn !py-2 text-xs ${newType === 'accessible' ? 'bg-azure text-white' : 'btn-ghost'}`}
             >
-              <Accessibility size={14} /> Invalid
+              <Accessibility size={14} /> Aftësi të kufizuara
             </button>
           </div>
         </div>
@@ -118,7 +118,7 @@ export function BuilderSidebar({
                   className={`btn w-full !py-2.5 text-xs ${selectedSpot.type === 'accessible' ? 'bg-azure text-white' : 'bg-mint text-[#03291B]'
                     }`}
                 >
-                  {selectedSpot.type === 'accessible' ? '♿ Invalid' : 'Standard'}
+                  {selectedSpot.type === 'accessible' ? '♿ Aftësi të kufizuara' : 'Standard'}
                 </button>
               </div>
             </div>

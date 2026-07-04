@@ -191,10 +191,20 @@ body {
   border-color: #FB7185;
 }
 
+.spot-label>div.is-expiring {
+  background: #F97316;
+  border-color: #FDBA74;
+}
+
+.spot-label>div.is-mine {
+  box-shadow: 0 0 0 2px #22D3EE, 0 1px 6px rgb(0 0 0 / .5);
+}
+
 .spot-label>div.is-selected {
-  background: #F59E0B;
-  border-color: #FBBF24;
-  color: #2B1A02;
+  background: #a6fd6c;
+  color: #0F172A;
+  border-color: #7ef52f;
+  box-shadow: 0 0 0 3px rgba(119, 255, 137, 0.55), 0 0 14px rgba(133, 255, 103, 0.5);
 }
 
 /* Markeri i Ndërtuesit (drag & drop) */

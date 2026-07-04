@@ -8,7 +8,7 @@ import { NavigationTab } from './NavigationTab.jsx';
 // Modali i vendit të zgjedhur: dy seksione - Pagesa dhe Navigimi (seksioni 14).
 export function SpotModal({
   open, onClose, zone, spot, tariffs, wallet,
-  myReservation, onWalletRefresh, onReserved, initialTab = 'pagesa',
+  myReservation, onWalletRefresh, onReserved, initialTab = 'pagesa', savedPlate = '',
 }) {
   const [tab, setTab] = useState(initialTab);
   useEffect(() => {
@@ -65,8 +65,9 @@ export function SpotModal({
           spot={spot}
           tariffs={tariffs}
           wallet={wallet}
+          savedPlate={savedPlate}
           onWalletRefresh={onWalletRefresh}
-          onReserved={(r) => { onReserved(r); setTab('navigimi'); }}
+          onReserved={(r) => { onReserved(r); onClose(); }}
         />
       )}
       {tab === 'pagesa' && !isFree && (

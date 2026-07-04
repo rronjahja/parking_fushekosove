@@ -24,6 +24,7 @@ profileRouter.get('/', requireIdentity, async (req, res, next) => {
             user: {
                 id: u.id, name: u.full_name, email: u.email, phone: u.phone,
                 role: u.role, emailVerified: !!u.email_verified, phoneVerified: !!u.phone_verified,
+                savedPlate: u.saved_plate || '',
                 createdAt: u.created_at,
             },
             wallet,
@@ -49,4 +50,12 @@ profileRouter.post('/verify/confirm', requireIdentity, authLimiter, async (req, 
     } catch (e) { next(e); }
 });
 
+profileRouter.put('/plate', requireIdentity, async (req, res, next) => {
+    try {
+        const raw = String(req.body?.plate ?? '').trim().toUpperCase();
+        const plate = raw.replace(/[^A-Z0-9\s-]/g, '').slice(0, 32) || null;
+        await db.run('UPDATE users SET saved_plate = ? WHERE id = ?', [plate, req.user.id]);
+        res.json({ savedPlate: plate || '' });
+    } catch (e) { next(e); }
+});
 export default profileRouter;
