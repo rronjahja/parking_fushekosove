@@ -142,6 +142,31 @@ body {
   }
 }
 
+/* ─── Modali/fleta në telefon ───────────────────────────────────────────── */
+
+/* Lartësia e fletës. 'dvh' është ekrani REALISHT i dukshëm dhe ndryshon kur
+   shfaqet/fshihet shiriti i adresës; 'vh' mbetet si rezervë për shfletuesit e
+   vjetër. Dy deklarata të njëpasnjëshme: shfletuesi që nuk e njeh të dytën
+   mban të parën. Prandaj nuk shkruhet si klasë Tailwind - atje nuk ka dot
+   fallback. */
+.sheet-max {
+  max-height: 92vh;
+  max-height: 88dvh;
+}
+
+/* Hapësirë poshtë sa shiriti i telefonit (iPhone) - që butoni i fundit të mos
+   mbulohet. Kërkon viewport-fit=cover te index.html, që e kemi. */
+.pb-safe {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Objektivat e prekjes: asnjë buton nën 40px lartësi në telefon. */
+@media (max-width: 640px) {
+  .btn {
+    min-height: 40px;
+  }
+}
+
 /* ─── Leaflet: pamja e hartës ───────────────────────────────────────────── */
 .leaflet-container {
   @apply rounded-2xl font-body;

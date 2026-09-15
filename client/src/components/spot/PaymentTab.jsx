@@ -8,6 +8,7 @@ import { TopUpModal } from './TopUpModal.jsx';
 import { Spinner } from '../ui/Spinner.jsx';
 import { payAndReserve } from '../../api/endpoints.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const METHOD_META = [
   { key: 'sms', label: t.methods.sms, icon: MessageSquare, activeCls: 'bg-violet-500 text-white' },
@@ -19,6 +20,9 @@ const METHOD_META = [
 // Butoni kryesor mbrohet nga klikimet e dyfishta (disabled gjatë procesimit).
 export function PaymentTab({ zone, spot, tariffs, wallet, savedPlate = '', onWalletRefresh, onReserved }) {
   const toast = useToast();
+  const { isAuthed } = useAuth();
+  // Kreditet i perkasin nje llogarie; vizitori paguan me SMS ose ne aparat.
+  const methods = isAuthed ? METHOD_META : METHOD_META.filter((m) => m.key !== 'credits');
   const [durationKey, setDurationKey] = useState(tariffs[0]?.key);
   const [plate, setPlate] = useState(savedPlate || localStorage.getItem('ps_last_plate') || '');
   const [foreignPlate, setForeignPlate] = useState(false);
@@ -29,7 +33,7 @@ export function PaymentTab({ zone, spot, tariffs, wallet, savedPlate = '', onWal
   useEffect(() => {
     if (savedPlate) setPlate(savedPlate);
   }, [savedPlate]);
-  const [method, setMethod] = useState('credits');
+  const [method, setMethod] = useState(isAuthed ? 'credits' : 'sms');
   const [busy, setBusy] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
 
@@ -61,8 +65,8 @@ export function PaymentTab({ zone, spot, tariffs, wallet, savedPlate = '', onWal
 
       <div>
         <label className="label">{t.payMethod}</label>
-        <div className="grid grid-cols-3 gap-2">
-          {METHOD_META.map(({ key, label, icon: Icon, activeCls }) => (
+        <div className={`grid gap-2 ${methods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {methods.map(({ key, label, icon: Icon, activeCls }) => (
             <button
               key={key}
               onClick={() => setMethod(key)}
@@ -87,6 +91,12 @@ export function PaymentTab({ zone, spot, tariffs, wallet, savedPlate = '', onWal
             <PlusCircle size={14} /> {t.topUp}
           </button>
         </div>
+      )}
+      {!isAuthed && (
+        <p className="rounded-xl bg-raised px-4 py-3 text-xs text-faint">
+          Po rezervoni si vizitor — llogaria nuk është e detyrueshme. Me llogari
+          ruani historikun, targën dhe mund të paguani me kredi.
+        </p>
       )}
       {method === 'sms' && (
         <p className="rounded-xl bg-raised px-4 py-3 text-xs text-faint">

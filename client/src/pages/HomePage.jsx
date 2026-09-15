@@ -73,7 +73,7 @@ export function HomePage() {
     fetchWallet().then((d) => setWallet(d.wallet)).catch(() => { });
     fetchMyReservations().then((d) => setMyReservations(d.reservations)).catch(() => { });
   };
-  usePolling(refreshPersonal, 5000, [ready, isAuthed], ready && isAuthed);
+  usePolling(refreshPersonal, 5000, [ready, isAuthed], ready);
 
   const totals = zones.length
     ? zones.reduce(
@@ -113,11 +113,6 @@ export function HomePage() {
   };
 
   const openSpot = (spot, tab = 'pagesa') => {
-    if (!isAuthed && spot.status === 'free') {
-      toast.info('Për të rezervuar një vend, ju lutemi kyçuni ose regjistrohuni.');
-      navigate('/hyrje', { state: { from: '/' } });
-      return;
-    }
     setSelectedNumber(spot.number);
     setFlyTarget({ center: { lat: spot.lat, lng: spot.lng }, zoom: 20 });
     setModalTab(spot.status === 'free' ? tab : 'navigimi');
@@ -174,7 +169,7 @@ export function HomePage() {
           onSpotClick={(s) => openSpot(s)}
           onDeselect={() => setSelectedNumber(null)}
           flyTarget={flyTarget}
-          heightClass="h-[420px] sm:h-[520px] lg:h-[620px]"
+          heightClass="h-[58dvh] min-h-[320px] sm:h-[520px] lg:h-[620px]"
         />
       </div>
 

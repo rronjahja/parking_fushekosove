@@ -43,6 +43,12 @@ export async function payAndReserve(ownerId, input) {
   const tariff = getTariff(input.durationKey);
   if (!tariff) throw bad('Zgjidhni një kohëzgjatje të vlefshme.');
 
+  // Vizitoret pa llogari paguajne me SMS ose ne aparat. Kuleta me kredi i
+  // perket nje llogarie reale, prandaj bllokohet ketu e jo vetem ne nderfaqe.
+  if (method === PAYMENT_METHOD.CREDITS && String(ownerId).startsWith('guest:')) {
+    throw bad('Pagesa me kredi kërkon llogari. Zgjidhni SMS ose aparatin.', 401, 'GUEST_NO_CREDITS');
+  }
+
   // Para-kontroll i shpejte (kontrolli perfundimtar behet brenda transaksionit).
   const pre = await getSpotOrThrow(zoneId, spotNumber);
   if (pre.status !== SPOT_STATUS.FREE) {

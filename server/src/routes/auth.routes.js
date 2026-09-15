@@ -22,6 +22,18 @@ const publicUser = (u) => ({
   phoneVerified: !!u.phone_verified,
 });
 
+// ── Identitet vizitori (pa llogari) ──
+// Rezervimi kërkon një identitet qe te lidhen vendi, pagesa dhe "Gjej veturën
+// time". Kjo NUK eshte llogari: nuk ruhet asnje rresht ne baze, eshte vetem nje
+// token qe mban nje id te rastesishem "guest:..." ne shfletuesin e vizitorit.
+// Llogaria mbetet opsionale dhe sherben per historikun, kreditet dhe chat-in.
+authRouter.post('/guest', (_req, res) => {
+  const id = `guest:${newId()}`;
+  res.status(201).json({
+    token: signToken({ sub: id, role: 'GUEST', name: 'Vizitor' }, '30d'),
+  });
+});
+
 // ── Regjistrimi i përdoruesve (email + telefon + fjalëkalim) ──
 authRouter.post('/register', authLimiter, async (req, res, next) => {
   try {

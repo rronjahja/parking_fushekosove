@@ -6,6 +6,7 @@ export const authRegister = (payload) => api('/auth/register', { method: 'POST',
 export const authLogin = (identifier, password) =>
   api('/auth/login', { method: 'POST', body: { identifier, password } });
 export const authMe = () => api('/auth/me');
+export const authGuest = () => api('/auth/guest', { method: 'POST' });
 
 // ── Profili ──
 export const fetchProfile = () => api('/profile');
